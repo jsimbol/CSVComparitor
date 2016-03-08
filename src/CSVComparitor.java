@@ -4,15 +4,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Arrays;
 
 
 
 public class CSVComparitor {
+	
+	Hashtable<Integer, String> directory = new Hashtable<Integer, String>();
 
-	ArrayList<ArrayList<String>> listOfLists = new ArrayList<ArrayList<String>>();
-	ArrayList<ArrayList<String>> listOfSupLists = new ArrayList<ArrayList<String>>();
+	HashSet<HashSet<String>> listOfLists = new HashSet<HashSet<String>>();
+	HashSet<HashSet<String>> listOfSupLists = new HashSet<HashSet<String>>();
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -25,7 +29,7 @@ public class CSVComparitor {
 
 	
 	
-	public ArrayList<String> listFilesForFolder(final File folder, ArrayList<String> output) {
+	public HashSet<String> listFilesForFolder(final File folder, HashSet<String> output) {
 		
 		
 	    for (final File fileEntry : folder.listFiles()) {
@@ -39,16 +43,47 @@ public class CSVComparitor {
 	        	}
 	        }
 	    }
+
 	    return output;
 	}
 	
 	
 
 
-	    public static void printRow(int[] row) {
-	        for (int i : row) {
-	            System.out.print(i);
+	    public void printRow(int[] row, int s) {
+	        
+	    	int x = 0;
+	    	for (int i : row) {
+	    		
+	    		if(s == 0 || x == 0) {
+	    		
+		        	if (directory.containsKey(i)) {
+		        		String temp = directory.get(i);
+		        		temp = temp.substring(temp.indexOf("_")+1, temp.length()-12);
+		        		temp = temp.substring(temp.indexOf("_")+1, temp.length());
+		        		temp = "ID: " + temp;
+		        		while (temp.length() < 15) {
+		        			temp = temp.concat(" ");
+		        		}
+		        		System.out.print(temp);
+		        	}
+		        	else {
+		        		String temp = Integer.toString(i);
+		        		while (temp.length() < 15) {
+		        			temp = temp.concat(" ");
+		        		}
+		        		System.out.print(temp);
+		        	}
+	    		}
+	    		else{
+		    		String temp = Integer.toString(i);
+	        		while (temp.length() < 15) {
+	        			temp = temp.concat(" ");
+	        		}
+	    			System.out.print(temp);
+	    		}
 	            System.out.print("\t");
+	            x++;
 	        }
 	        System.out.println();
 	    }
@@ -62,22 +97,26 @@ public class CSVComparitor {
 	 public void run() {
 		 
 		 
-		 
-		 
 			BufferedReader br = null;
 			String line = "";
 			String cvsSplitBy = ",";
-			int counter = 0;
-			ArrayList <String> listOfFiles = new ArrayList<String>();
-			ArrayList <ArrayList<String>> listOfEmailLists = new ArrayList<ArrayList<String>>();
+			HashSet <String> listOfFiles = new HashSet<String>();
+			HashSet <HashSet<String>> listOfEmailLists = new HashSet<HashSet<String>>();
 			
 			listFilesForFolder(folder, listOfFiles);
 
-			for (int x = 0; x < listOfFiles.size(); x++) {
-				String csvFile = listOfFiles.get(x);
-				ArrayList <String> listOfEmails = new ArrayList<String>();
+			Iterator listOfFilesIterator = listOfFiles.iterator();
+			while(listOfFilesIterator.hasNext()){
+				String csvFile = (String) listOfFilesIterator.next();
+				HashSet <String> listOfEmails = new HashSet<String>();
+				
+				int temp = csvFile.indexOf("t/");
+		    	temp++;
+		    	temp++;
+		    	String temp2 = csvFile.substring(temp, csvFile.length()-4);
+		    	
+				
 				try {
-					System.out.println(csvFile);
 					br = new BufferedReader(new FileReader(csvFile));
 					while ((line = br.readLine()) != null) {
 						//System.out.println(x);
@@ -100,29 +139,32 @@ public class CSVComparitor {
 						}
 					}
 				}
-				
+				directory.put(listOfEmails.size()-1, temp2);
 				listOfEmailLists.add(listOfEmails);
 				//System.out.println("Email number = " + listOfFiles.get(x));
 				//System.out.println("Email Size = " + listOfEmailLists.get(x).size());
 			}
 			
-			//listOfLists = (ArrayList<String>) listOfEmailLists.clone();
+			//listOfLists = (HashSet<String>) listOfEmailLists.clone();
 			
-			ArrayList<ArrayList<String>> comparitorListOfLists = listOfEmailLists;
+			HashSet<HashSet<String>> comparitorListOfLists = listOfEmailLists;
 			int numberOfEmailLists = listOfEmailLists.size();
 			int numberOfEmailListsForIterating = numberOfEmailLists - 1;
-			int[][] tableOfDuplicates = new int[numberOfEmailLists][numberOfEmailLists]; 
+			int[][] tableOfDuplicates = new int[numberOfEmailLists+1][numberOfEmailLists+1]; 
 			
 			//iterate through list of emails
-			for (int x = 0; x < listOfEmailLists.size(); x++) {
+			Iterator listOfEmailsIterator = listOfEmailLists.iterator();
+			int x = 0;
+			while (listOfEmailsIterator.hasNext()){
 				//System.out.println(listOfEmailLists.get(x));
-				ArrayList<String> originalList = listOfEmailLists.get(x);
+				HashSet<String> originalList = (HashSet<String>) listOfEmailsIterator.next();
 				int originalSize = originalList.size();
-				
+				int y = 0;
 				//iterate list of other emails
-				for (int y = x+1; y < listOfEmailLists.size(); y++ ) {
-					ArrayList<String> workingOriginalList = (ArrayList<String>) originalList.clone();
-					ArrayList<String> comparitorList = listOfEmailLists.get(y);
+				Iterator listOfEmailsIterator2 = listOfEmailLists.iterator();
+				while (listOfEmailsIterator2.hasNext()){
+					HashSet<String> workingOriginalList = (HashSet<String>) originalList.clone();
+					HashSet<String> comparitorList = (HashSet<String>) listOfEmailsIterator2.next();
 					workingOriginalList.removeAll(comparitorList);
 					int dedupedSize = workingOriginalList.size();
 					int duplicates = originalSize - dedupedSize;
@@ -131,32 +173,32 @@ public class CSVComparitor {
 					duplicates--;
 					
 					//add number of duplicates to the table of duplicates
-					tableOfDuplicates[x][y] = duplicates;
-					tableOfDuplicates[y][x] = duplicates;
-
-					
+					tableOfDuplicates[x+1][y+1] = duplicates;
+					tableOfDuplicates[y+1][x+1] = duplicates;
+					tableOfDuplicates[x+1][0] = originalList.size()-1;
+					tableOfDuplicates[0][y+1] = comparitorList.size()-1;
+					y++;
 					
 				//end iterating list of other emails
 				}
+				x++;
+				
 								
 			//end of iteration through list of emails	
 			}
 			
-			for (int z = 1; z <= listOfFiles.size(); z++) {
-				String filenameAndNumber = z + ") " + listOfFiles.get(z-1).substring(listOfFiles.get(z-1).indexOf("t/")+2, listOfFiles.get(z-1).length());
-				System.out.println(filenameAndNumber + " - " + (listOfEmailLists.get(z-1).size()-1));
-			}
 			
 			System.out.println("\n");
-
+			int s = 0;
 	        for(int[] row : tableOfDuplicates) {
-	            printRow(row);
+	            printRow(row, s);
+	            s++;
 	        }
 	        
 	       
 
 	        
-	        System.out.println("LULZ ALL DONE");
+	        System.out.println("Complete");
 	        
 	        
 		  }

@@ -1,182 +1,134 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.ArrayList;
 
 public class Suppression extends Thread{
+	private HashSet<String> supList;
+	private String to;
+	final static File folder = new File("/Users/jaysimbol/Documents/BrightTALK/EmailLists/2016/NA/test");
+	final static File suppressionListFile = new File("/Users/jaysimbol/Desktop/SuppressionList/BrightTALKSuppressionList.csv");
 	
-	ArrayList<String> aList = new ArrayList<String>();
-	ArrayList<String> bList = new ArrayList<String>();
-	ArrayList<String> cList = new ArrayList<String>();
-	ArrayList<String> dList = new ArrayList<String>();
-	ArrayList<String> eList = new ArrayList<String>();
-	ArrayList<String> fList = new ArrayList<String>();
-	ArrayList<String> gList = new ArrayList<String>();
-	ArrayList<String> hList = new ArrayList<String>();
-	ArrayList<String> iList = new ArrayList<String>();
-	ArrayList<String> jList = new ArrayList<String>();
-	ArrayList<String> kList = new ArrayList<String>();
-	ArrayList<String> lList = new ArrayList<String>();
-	ArrayList<String> mList = new ArrayList<String>();
-	ArrayList<String> nList = new ArrayList<String>();
-	ArrayList<String> oList = new ArrayList<String>();
-	ArrayList<String> pList = new ArrayList<String>();
-	ArrayList<String> qList = new ArrayList<String>();
-	ArrayList<String> rList = new ArrayList<String>();
-	ArrayList<String> sList = new ArrayList<String>();
-	ArrayList<String> tList = new ArrayList<String>();
-	ArrayList<String> uList = new ArrayList<String>();
-	ArrayList<String> vList = new ArrayList<String>();
-	ArrayList<String> wList = new ArrayList<String>();
-	ArrayList<String> xList = new ArrayList<String>();
-	ArrayList<String> yList = new ArrayList<String>();
-	ArrayList<String> zList = new ArrayList<String>();
-	ArrayList<String> charList = new ArrayList<String>();
+	public Suppression(String to, HashSet<String> supList) {
+		this.supList = supList;
+		this.to = to;
+	}
+	
+	public static ArrayList<String> listFilesForFolder(final File folder, ArrayList<String> output) {
+		
+		
+	    for (final File fileEntry : folder.listFiles()) {
+	        if (fileEntry.isDirectory()) {
+
+	        } else {
+	        	String temp = "/" + fileEntry.getName();
+	        	if (!fileEntry.getName().contains(".DS_Store")){
+	        		output.add(folder.toString().concat(temp));
+	        		//System.out.println(folder.toString().concat(fileEntry.getName()));
+	        	}
+	        }
+	    }
+	    return output;
+	}
 	
 	
-	//constructor
-	public Suppression(ArrayList<String> list) {
-		for (int x = 0; x < list.size(); x++) {
-			String temp = list.get(x).substring(0, 1);
-			String tempEmail = list.get(x);
-			switch (temp) {
-			case "a":
-				aList.add(tempEmail);
-				break;
-			case "b":
-				bList.add(tempEmail);
-				break;
-			case "c":
-				cList.add(tempEmail);
-				break;
-			case "d":
-				dList.add(tempEmail);
-				break;
-			case "e":
-				eList.add(tempEmail);
-				break;
-			case "f":
-				fList.add(tempEmail);
-				break;
-			case "g":
-				gList.add(tempEmail);
-				break;
-			case "h":
-				hList.add(tempEmail);
-				break;
-			case "i":
-				iList.add(tempEmail);
-				break;
-			case "j":
-				jList.add(tempEmail);
-				break;
-			case "k":
-				kList.add(tempEmail);
-				break;
-			case "l":
-				lList.add(tempEmail);
-				break;
-			case "m":
-				mList.add(tempEmail);
-				break;
-			case "n":
-				nList.add(tempEmail);
-				break;
-			case "o":
-				oList.add(tempEmail);
-				break;
-			case "p":
-				pList.add(tempEmail);
-				break;
-			case "q":
-				qList.add(tempEmail);
-				break;
-			case "r":
-				rList.add(tempEmail);
-				break;
-			case "s":
-				sList.add(tempEmail);
-				break;
-			case "t":
-				tList.add(tempEmail);
-				break;
-			case "u":
-				uList.add(tempEmail);
-				break;
-			case "v":
-				vList.add(tempEmail);
-				break;
-			case "w":
-				wList.add(tempEmail);
-				break;
-			case "x":
-				xList.add(tempEmail);
-				break;
-			case "y":
-				yList.add(tempEmail);
-				break;
-			case "z":
-				zList.add(tempEmail);
-				break;
-			default:
-				charList.add(tempEmail);
-				break;
+	
+	private static HashSet<String> createSuppressionArray() {
+		BufferedReader br = null;
+		String line = "";
+		String cvsSplitBy = ",";
+		int counter = 0;
+		HashSet <String> suppressionList = new HashSet<String>();
+		
+		try {
+			
+			br = new BufferedReader(new FileReader(suppressionListFile));
+			while ((line = br.readLine()) != null) {
+			
+			    // use comma as separator
+				String[] email = line.split(cvsSplitBy);
+				
+				email[0] = email[0].substring(1, email[0].length() - 1);
+				//System.out.println(email[0]);
+				
+				//add email to list of emails
+				suppressionList.add(email[0]);
+				
+				counter++;
+			}
+			//System.out.println(counter);
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
+		return suppressionList;
+
 	}
 	
-	public Suppression(Suppression copier) {
-		this.aList = new ArrayList<String>(copier.aList);
-		this.bList = new ArrayList<String>(copier.bList);
-		this.cList = new ArrayList<String>(copier.cList);
-		this.dList = new ArrayList<String>(copier.dList);
-		this.eList = new ArrayList<String>(copier.eList);
-		this.fList = new ArrayList<String>(copier.fList);
-		this.gList = new ArrayList<String>(copier.gList);
-		this.hList = new ArrayList<String>(copier.hList);
-		this.iList = new ArrayList<String>(copier.iList);
-		this.jList = new ArrayList<String>(copier.jList);
-		this.kList = new ArrayList<String>(copier.kList);
-		this.lList = new ArrayList<String>(copier.lList);
-		this.mList = new ArrayList<String>(copier.mList);
-		this.nList = new ArrayList<String>(copier.nList);
-		this.oList = new ArrayList<String>(copier.oList);
-		this.pList = new ArrayList<String>(copier.pList);
-		this.qList = new ArrayList<String>(copier.qList);
-		this.rList = new ArrayList<String>(copier.rList);
-		this.sList = new ArrayList<String>(copier.sList);
-		this.tList = new ArrayList<String>(copier.tList);
-		this.uList = new ArrayList<String>(copier.uList);
-		this.vList = new ArrayList<String>(copier.vList);
-		this.wList = new ArrayList<String>(copier.wList);
-		this.xList = new ArrayList<String>(copier.xList);
-		this.yList = new ArrayList<String>(copier.yList);
-		this.zList = new ArrayList<String>(copier.zList);
-		this.charList = new ArrayList<String>(copier.charList);
+	
+	@Override
+	public void run() {
+		//System.out.println(supList.size());
+		//System.out.println("Hello " + to);
+		BufferedReader fileReader = null;
+		String lineForCSV = "";
+		String csvSplitter = ",";
+		ArrayList <String> listOfEmails = new ArrayList<String>();
+		try {
+			fileReader = new BufferedReader(new FileReader(to));
+			while((lineForCSV = fileReader.readLine()) != null) {
+				String[] email = lineForCSV.split(csvSplitter);
+				listOfEmails.add(email[1]);
+				//System.out.println("Still working for " + to);
+			}
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//System.out.println("DONE with part 1");
+		int beforeSize = listOfEmails.size();
+		listOfEmails.removeAll(supList);
+		//System.out.println("DONE WITH PART 2");
+		int afterSize = listOfEmails.size();
+		int totalUnsubscribes = beforeSize - afterSize;
+		System.out.println(to + "\nTotal Size = " + beforeSize + "\n" + "Total Unsubscribes = " + totalUnsubscribes + "\n" + "SizeAfterUnsubscribes = " + afterSize + "\n\n");
+		
+		
 	}
 	
-	/*Thread t1 = new Thread() {
-		public void run() {
+	public static void main(String[] args) {
+		HashSet<String> supList = new HashSet<String>();
+	    supList = createSuppressionArray();
+	    //System.out.println("IM HERE" + supList.size());
+
+		//createListofCSVFiles
+		ArrayList<String> listOfFiles = new ArrayList<String>();
+		ArrayList<ArrayList<String>> listOfEmailLists = new ArrayList<ArrayList<String>>();
+		
+		listFilesForFolder(folder, listOfFiles);
+		for (String s: listOfFiles) {
+			if ( !s.contains(".DS_Store")) {
+				new Suppression(s, supList).start();
+			}
 			
 		}
-	};*/
-	
-	private String to;
-	public Suppression(String to) {
-		this.to= to;
-	}
-	
-	public void run() {
-		System.out.println("hello" + to);
-	}
-	
-	public int dupeLists (Suppression list) {
-		int returning = 0;
 		
-		Suppression temp1 = new Suppression(this);
-		Suppression temp2 = new Suppression(list);
 		
-		//temp1.aList.removeAll(temp2.aList);
-		new Suppression("world!").start();
-	
-		return returning;
 	}
 	
 }
